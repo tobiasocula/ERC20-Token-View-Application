@@ -34,11 +34,14 @@ function App() {
 
   const networkValues = {mainnet: "Mainnet", sepolia: "Sepolia"};
 
-  // Not yet fetched!
-  // Loading...
-  // Incorrect address!
-  // An error occured. Try again later.
-  // (fetched)
+  const findAccIndex = (id) => {
+        for (let i=0; i<accounts.length; i++) {
+            if (accounts[i].id === id) {
+                return i;
+            }
+        }
+    }
+
   console.log(`address: ${accounts[0].address}`);
 
   return (
@@ -50,7 +53,7 @@ function App() {
 
             {accounts.length > 1 && (
               <div className='remove-acc-container'>
-              <div className='remove-account' onClick={() => removeAccount(acc.id)}>
+              <div className='remove-account' onClick={() => removeAccount(findAccIndex(acc.id))}>
                 Remove
             </div>
             </div>
@@ -61,20 +64,21 @@ function App() {
             <form className='form' onSubmit={async (e) => {
                   e.preventDefault();
 
-                  setAccStates((prev) => setVal(prev, 1, acc.id)); // to loading
+                  const index = findAccIndex(acc.id);
+                  setAccStates((prev) => setVal(prev, 1, index)); // to loading
                   await new Promise((resolve) => setTimeout(resolve, 0));
 
-                  if (!ethers.isAddress(accAddresses[acc.id])) {
-                    setAccStates((prev) => setVal(prev, 2, acc.id)); // Invalid address
-                  } else if (await setData(acc.id, accAddresses[acc.id], accNetworks[acc.id])) {
-                    setAccStates((prev) => setVal(prev, 4, acc.id)); // Success
+                  if (!ethers.isAddress(accAddresses[index])) {
+                    setAccStates((prev) => setVal(prev, 2, index)); // Invalid address
+                  } else if (await setData(index, accAddresses[index], accNetworks[index])) {
+                    setAccStates((prev) => setVal(prev, 4, index)); // Success
                   } else {
-                    setAccStates((prev) => setVal(prev, 3, acc.id));; // Failure
+                    setAccStates((prev) => setVal(prev, 3, index));; // Failure
                   }
                 }}>
-              <input className='input' type="text" value={accAddresses[acc.id]} onChange={
+              <input className='input' type="text" value={accAddresses[findAccIndex(acc.id)]} onChange={
                 (e) => {
-                  setAccAddresses((prev) => setVal(prev, e.target.value, acc.id));
+                  setAccAddresses((prev) => setVal(prev, e.target.value, findAccIndex(acc.id)));
                 }
               }></input>
               <button className='form-button' type="submit">Search</button>
@@ -84,9 +88,9 @@ function App() {
               Select network
               <select
                   className="networks"
-                  value={accNetworks[acc.id]}
+                  value={accNetworks[findAccIndex(acc.id)]}
                   onChange={(e) => {
-              setAccNetworks((prev) => setVal(prev, e.target.value, acc.id));
+              setAccNetworks((prev) => setVal(prev, e.target.value, findAccIndex(acc.id)));
             }}>
                 {Object.keys(networkValues).map((k) => (
                   <option key={k} value={networkValues[k]}>{networkValues[k]}</option>
@@ -97,7 +101,7 @@ function App() {
 
 
             <div className='acc-data'>
-              {accStates[acc.id] === 4 && acc.data ? (
+              {accStates[findAccIndex(acc.id)] === 4 && acc.data ? (
                 <div className='acc-loaded-data'>
                   Data:
                   <div className='token-data-section'>
@@ -144,13 +148,13 @@ function App() {
                   </div>
               )
                : (
-                accStates[acc.id] === 1 ? (
+                accStates[findAccIndex(acc.id)] === 1 ? (
                   <div className='loading'>Loading...</div>
                 ) : (
-                  accStates[acc.id] === 2 ? (
+                  accStates[findAccIndex(acc.id)] === 2 ? (
                     <div className='incor-addr'>Incorrect address!</div>
                   ) : (
-                    accStates[acc.id] === 3 ? (
+                    accStates[findAccIndex(acc.id)] === 3 ? (
                       <div className='error'>An error occured. Try again later.</div>
                     ) : (
                       <div className='nothing'>Nothing here yet.</div>
@@ -163,7 +167,9 @@ function App() {
           </div>
         ))}
         <div className='add-account'>
+          <div className='add-account-frame'>
           <img className='add-acc-button' onClick={addAccount} src='/plus.png' alt="plus image" />
+          </div>
         </div>
       </div>
     </>
