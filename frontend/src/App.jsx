@@ -68,7 +68,7 @@ function App() {
                   setAccStates((prev) => setVal(prev, 1, index)); // to loading
                   await new Promise((resolve) => setTimeout(resolve, 0));
 
-                  if (!ethers.isAddress(accAddresses[index])) {
+                  if (!ethers.utils.isAddress(accAddresses[index])) {
                     setAccStates((prev) => setVal(prev, 2, index)); // Invalid address
                   } else if (await setData(index, accAddresses[index], accNetworks[index])) {
                     setAccStates((prev) => setVal(prev, 4, index)); // Success
